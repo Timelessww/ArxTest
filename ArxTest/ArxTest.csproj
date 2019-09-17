@@ -80,6 +80,9 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>C:\Autodesk\Autodesk_ObjectARX_2018_Win_64_and_32_Bit\inc-x64\Autodesk.AutoCAD.Interop.Common.dll</HintPath>
     </Reference>
+    <Reference Include="DotNetARX">
+      <HintPath>..\DotNetARX\bin\Debug\DotNetARX.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />

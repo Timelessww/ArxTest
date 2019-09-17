@@ -536,7 +536,7 @@ namespace DotNetARX
             public static Color GraphicsWinModelBackgrndColor
             {
                 get { return ColorTranslator.FromOle(Convert.ToInt32(Preferences.GetProperties("Display", "GraphicsWinModelBackgrndColor"))); }
-                set { Preferences.SetProperties("Display", "GraphicsWinModelBackgrndColor", ColorTranslator.ToOle(value)); }
+                                              set { Preferences.SetProperties("Display", "GraphicsWinModelBackgrndColor", ColorTranslator.ToOle(value)); }
             }
 
             /// <summary>

@@ -14,7 +14,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 using Autodesk.AutoCAD.EditorInput;
 using ArxDotNetLesson;
-
+using DotNetARX;
 namespace ArxTest
 
 {
@@ -462,20 +462,22 @@ namespace ArxTest
         }
         #endregion
 
-        //Matrix3d -Displacement 开事务
-        //TransformBy
+       
 
-            //画圆弧
+
+
+        #region 圆弧
+        //画圆弧
         [CommandMethod("Fan")]
         public static void Fan()
         {
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                //定义圆弧上的三个点
-                Point3d startPoint = new Point3d(100, 0, 0);
-                Point3d pointOnArc = new Point3d(50, 25, 0);
-                Point3d endPoint = new Point3d();
+                 Point3d startPoint = new Point3d(100, 0, 0);
+              //定义圆弧上的三个点
+                 Point3d pointOnArc = new Point3d(50, 25, 0);
+                  Point3d endPoint = new Point3d();
                 //调用三点法画圆弧的扩展函数创建扇形的圆弧
                 Arc arc = new Arc();
                 arc.CreateArc(startPoint, pointOnArc, endPoint);
@@ -484,13 +486,172 @@ namespace ArxTest
                 Line line2 = new Line(arc.Center, endPoint);
                 //一次性添加实体到模型空间，完成扇形的创建
                 db.AddToModelSpace(line1, line2, arc);
-               
                 trans.Commit();
             }
         }
 
 
+        #endregion
+
+        #region 多段线形成圆弧
+        [CommandMethod("AddPolyline")]
+        public void AddPolyline()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                Point2d startPoint = Point2d.Origin;
+                Point2d endPoint = new Point2d(100, 100);
+                Point2d pt = new Point2d(60, 70);
+                Point2d center = new Point2d(50, 50);
+                //创建直线
+                Polyline pline = new Polyline();
+                pline.CreatePolyline(startPoint, endPoint);
+                //创建矩形
+                Polyline rectangle = new Polyline();
+                rectangle.CreateRectangle(pt, endPoint);
+                //创建正六边形
+                Polyline polygon = new Polyline();
+                polygon.CreatePolygon(Point2d.Origin, 6, 30);
+                //创建半径为30的圆
+                Polyline circle = new Polyline();
+                circle.CreatePolyCircle(center, 30);
+                //创建圆弧，起点角度为45度，终点角度为225度
+                Polyline arc = new Polyline();
+                double startAngle = 45;
+                double endAngle = 225;
+                arc.CreatePolyArc(center, 50, startAngle.DegreeToRadian(), endAngle.DegreeToRadian());
+                //添加对象到模型空间
+                db.AddToModelSpace(pline, rectangle, polygon, circle, arc);
+                trans.Commit();
+            }
+        }
+        #endregion
+
+        #region 椭圆和样条曲线
+        [CommandMethod("AddEllipse")]
+        public void AddEllipse()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                Vector3d majorAxis = new Vector3d(40, 0, 0);//长轴端点
+                //使用中心点、所在平面、长轴矢量和半径比例(0.5)创建一个椭圆
+                Ellipse ellipse1 = new Ellipse(Point3d.Origin, Vector3d.ZAxis, majorAxis, 0.5, 0, 2 * Math.PI);
+                Ellipse ellipse2 = new Ellipse();//新建一个椭圆
+                //定义外接矩形的两个角点
+                Point3d pt1 = new Point3d(-40, -40, 0);
+                Point3d pt2 = new Point3d(40, 40, 0);
+                //根据外接矩形创建椭圆
+                ellipse2.CreateEllipse(pt1, pt2);
+                //创建椭圆弧
+                majorAxis = new Vector3d(0, 40, 0);
+                Ellipse ellipseArc = new Ellipse(Point3d.Origin, Vector3d.ZAxis, majorAxis, 0.25, Math.PI, 2 * Math.PI);
+                //添加实体到模型空间
+                db.AddToModelSpace(ellipse1, ellipse2, ellipseArc);
+                trans.Commit();
+            }
+        }
+
+
+        [CommandMethod("AddSpline")]
+        public void AddSpline()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //使用样本点直接创建4阶样条曲线
+                Point3dCollection pts = new Point3dCollection();
+                pts.Add(new Point3d(0, 0, 0));
+                pts.Add(new Point3d(10, 30, 0));
+                pts.Add(new Point3d(60, 80, 0));
+                pts.Add(new Point3d(100, 100, 0));
+                Spline spline1 = new Spline(pts, 4, 0);
+                //根据起点和终点为的切线方向创建样条曲线
+                Vector3d startTangent = new Vector3d(5, 1, 0);                                
+                Vector3d endTangent = new Vector3d(5, 1, 0);
+                pts[1] = new Point3d(30, 10, 0);
+                pts[2] = new Point3d(80, 60, 0);
+                Spline spline2 = new Spline(pts, startTangent, endTangent, 4, 0);
+                db.AddToModelSpace(spline1, spline2);
+                trans.Commit();
+            }
+        }
+        #endregion
+
+        #region 文本DBText
+
+        [CommandMethod("AddText")]
+        public void AddText()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                DBText textFirst = new DBText(); // 创建第一个单行文字
+                textFirst.Position = new Point3d(50, 50, 0);//文字位置
+                textFirst.Height = 5;//文字高度 
+                //设置文字内容，特殊格式为≈、下划线和平方
+                textFirst.TextString = "面积" + TextSpecialSymbol.AlmostEqual + TextSpecialSymbol.Underline + "2000" + TextSpecialSymbol.Underline + "m" + TextSpecialSymbol.Square;
+                //设置文字的水平对齐方式为居中
+                textFirst.HorizontalMode = TextHorizontalMode.TextCenter;
+                //设置文字的垂直对齐方式为居中
+                textFirst.VerticalMode = TextVerticalMode.TextVerticalMid;
+                //设置文字的对齐点
+                textFirst.AlignmentPoint = textFirst.Position;
+                DBText textSecond = new DBText();// 创建第二个单行文字
+                textSecond.Height = 5; //文字高度
+                //设置文字内容，特殊格式为角度、希腊字母和度数
+                textSecond.TextString = TextSpecialSymbol.Angle + TextSpecialSymbol.Belta + "=45" + TextSpecialSymbol.Degree;
+                //设置文字的对齐方式为居中对齐
+                textSecond.HorizontalMode = TextHorizontalMode.TextCenter;
+                textSecond.VerticalMode = TextVerticalMode.TextVerticalMid;
+                //设置文字的对齐点
+                textSecond.AlignmentPoint = new Point3d(50, 40, 0);
+                DBText textLast = new DBText();//创建第三个单行文字
+                textLast.Height = 5;// 文字高度
+                //设置文字的内容，特殊格式为直径和公差
+                textLast.TextString = TextSpecialSymbol.Diameter + "30的直径偏差为" + TextSpecialSymbol.Tolerance + "0.01";
+                //设置文字的对齐方式为居中对齐
+                textLast.HorizontalMode = TextHorizontalMode.TextCenter;
+                textLast.VerticalMode = TextVerticalMode.TextVerticalMid;
+                //设置文字的对齐点
+                textLast.AlignmentPoint = new Point3d(50, 30, 0);
+                db.AddToModelSpace(textFirst, textSecond, textLast);//添加文本到模型空间
+                trans.Commit();//提交事务处理
+            }
+        }
+
+        [CommandMethod("AddStackText")]
+        public void AddStackText()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                MText mtext = new MText();//创建多行文本对象
+                mtext.Location = new Point3d(100, 40, 0);//位置
+                //创建水平分数形式的堆叠文字
+                string firstLine = TextTools.StackText(TextSpecialSymbol.Diameter + "20", "H7", "P7", StackType.HorizontalFraction, 0.5);
+                //创建斜分数形式的堆叠文字
+                string secondLine = TextTools.StackText(TextSpecialSymbol.Diameter + "20", "H7", "P7", StackType.ItalicFraction, 0.5);
+                //创建公差形式的堆叠文字
+                string lastLine = TextTools.StackText(TextSpecialSymbol.Diameter + "20", "+0.020", "-0.010", StackType.Tolerance, 0.5);
+                //将前面定义的堆叠文字合并，作为多行文本的内容
+                mtext.Contents = firstLine + MText.ParagraphBreak + secondLine + "\n" + lastLine;
+                mtext.TextHeight = 5;//文本高度
+                mtext.Width = 0;//文本宽度，设为0表示不会自动换行
+                //设置多行文字的对齐方式正中
+                mtext.Attachment = AttachmentPoint.MiddleCenter;
+                db.AddToModelSpace(mtext);//添加文本到模型空间中
+                trans.Commit();//提交事务处理
+            }
+        }
+        #endregion
+
+        #region MyRegion
+
+        #endregion
+
 
     }
-   
+
 }
