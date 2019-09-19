@@ -16,6 +16,7 @@ using Autodesk.AutoCAD.EditorInput;
 using ArxDotNetLesson;
 using DotNetARX;
 using Autodesk.AutoCAD.Colors;
+using System.Linq;
 
 namespace ArxTest
 
@@ -51,7 +52,7 @@ namespace ArxTest
 
         [CommandMethod("cmd1")]
 
-        public void test()
+        public void Test()
 
         {
 
@@ -167,7 +168,7 @@ namespace ArxTest
 
             i--;
 
-            test();
+            Test();
 
         }
         #endregion
@@ -177,7 +178,7 @@ namespace ArxTest
 
         [CommandMethod("test1")]
 
-        public void test1()
+        public void Test1()
 
         {
 
@@ -300,7 +301,7 @@ namespace ArxTest
 
         [CommandMethod("test2")]
 
-        public void test2()
+        public void Test2()
 
         {
 
@@ -328,9 +329,10 @@ namespace ArxTest
 
             p2 = l2.GetClosestPointTo(p1, true);
 
-            Line c = new Line(p1, p2);
-
-            c.ColorIndex = 1;
+            Line c = new Line(p1, p2)
+            {
+                ColorIndex = 1
+            };
 
             btr.AppendEntity(l1);
 
@@ -355,7 +357,7 @@ namespace ArxTest
         #region 根据两点和半径绘制一段圆弧  
         [CommandMethod("ptest")]
 
-        public void pprArc()
+        public void PprArc()
 
         {
 
@@ -464,7 +466,7 @@ namespace ArxTest
         }
         #endregion
 
-       
+
 
 
 
@@ -476,10 +478,10 @@ namespace ArxTest
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                 Point3d startPoint = new Point3d(100, 0, 0);
-              //定义圆弧上的三个点
-                 Point3d pointOnArc = new Point3d(50, 25, 0);
-                  Point3d endPoint = new Point3d();
+                Point3d startPoint = new Point3d(100, 0, 0);
+                //定义圆弧上的三个点
+                Point3d pointOnArc = new Point3d(50, 25, 0);
+                Point3d endPoint = new Point3d();
                 //调用三点法画圆弧的扩展函数创建扇形的圆弧
                 Arc arc = new Arc();
                 arc.CreateArc(startPoint, pointOnArc, endPoint);
@@ -563,14 +565,16 @@ namespace ArxTest
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 //使用样本点直接创建4阶样条曲线
-                Point3dCollection pts = new Point3dCollection();
-                pts.Add(new Point3d(0, 0, 0));
-                pts.Add(new Point3d(10, 30, 0));
-                pts.Add(new Point3d(60, 80, 0));
-                pts.Add(new Point3d(100, 100, 0));
+                Point3dCollection pts = new Point3dCollection
+                {
+                    new Point3d(0, 0, 0),
+                    new Point3d(10, 30, 0),
+                    new Point3d(60, 80, 0),
+                    new Point3d(100, 100, 0)
+                };
                 Spline spline1 = new Spline(pts, 4, 0);
                 //根据起点和终点为的切线方向创建样条曲线
-                Vector3d startTangent = new Vector3d(5, 1, 0);                                
+                Vector3d startTangent = new Vector3d(5, 1, 0);
                 Vector3d endTangent = new Vector3d(5, 1, 0);
                 pts[1] = new Point3d(30, 10, 0);
                 pts[2] = new Point3d(80, 60, 0);
@@ -589,35 +593,41 @@ namespace ArxTest
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                DBText textFirst = new DBText(); // 创建第一个单行文字
-                textFirst.Position = new Point3d(50, 50, 0);//文字位置
-                textFirst.Height = 5;//文字高度 
-                //设置文字内容，特殊格式为≈、下划线和平方
-                textFirst.TextString = "面积" + TextSpecialSymbol.AlmostEqual + TextSpecialSymbol.Underline + "2000" + TextSpecialSymbol.Underline + "m" + TextSpecialSymbol.Square;
-                //设置文字的水平对齐方式为居中
-                textFirst.HorizontalMode = TextHorizontalMode.TextCenter;
-                //设置文字的垂直对齐方式为居中
-                textFirst.VerticalMode = TextVerticalMode.TextVerticalMid;
+                DBText textFirst = new DBText
+                {
+                    Position = new Point3d(50, 50, 0),//文字位置
+                    Height = 5,//文字高度 
+                               //设置文字内容，特殊格式为≈、下划线和平方
+                    TextString = "面积" + TextSpecialSymbol.AlmostEqual + TextSpecialSymbol.Underline + "2000" + TextSpecialSymbol.Underline + "m" + TextSpecialSymbol.Square,
+                    //设置文字的水平对齐方式为居中
+                    HorizontalMode = TextHorizontalMode.TextCenter,
+                    //设置文字的垂直对齐方式为居中
+                    VerticalMode = TextVerticalMode.TextVerticalMid
+                }; // 创建第一个单行文字
                 //设置文字的对齐点
                 textFirst.AlignmentPoint = textFirst.Position;
-                DBText textSecond = new DBText();// 创建第二个单行文字
-                textSecond.Height = 5; //文字高度
-                //设置文字内容，特殊格式为角度、希腊字母和度数
-                textSecond.TextString = TextSpecialSymbol.Angle + TextSpecialSymbol.Belta + "=45" + TextSpecialSymbol.Degree;
-                //设置文字的对齐方式为居中对齐
-                textSecond.HorizontalMode = TextHorizontalMode.TextCenter;
-                textSecond.VerticalMode = TextVerticalMode.TextVerticalMid;
-                //设置文字的对齐点
-                textSecond.AlignmentPoint = new Point3d(50, 40, 0);
-                DBText textLast = new DBText();//创建第三个单行文字
-                textLast.Height = 5;// 文字高度
-                //设置文字的内容，特殊格式为直径和公差
-                textLast.TextString = TextSpecialSymbol.Diameter + "30的直径偏差为" + TextSpecialSymbol.Tolerance + "0.01";
-                //设置文字的对齐方式为居中对齐
-                textLast.HorizontalMode = TextHorizontalMode.TextCenter;
-                textLast.VerticalMode = TextVerticalMode.TextVerticalMid;
-                //设置文字的对齐点
-                textLast.AlignmentPoint = new Point3d(50, 30, 0);
+                DBText textSecond = new DBText
+                {
+                    Height = 5, //文字高度
+                                //设置文字内容，特殊格式为角度、希腊字母和度数
+                    TextString = TextSpecialSymbol.Angle + TextSpecialSymbol.Belta + "=45" + TextSpecialSymbol.Degree,
+                    //设置文字的对齐方式为居中对齐
+                    HorizontalMode = TextHorizontalMode.TextCenter,
+                    VerticalMode = TextVerticalMode.TextVerticalMid,
+                    //设置文字的对齐点
+                    AlignmentPoint = new Point3d(50, 40, 0)
+                };// 创建第二个单行文字
+                DBText textLast = new DBText
+                {
+                    Height = 5,// 文字高度
+                               //设置文字的内容，特殊格式为直径和公差
+                    TextString = TextSpecialSymbol.Diameter + "30的直径偏差为" + TextSpecialSymbol.Tolerance + "0.01",
+                    //设置文字的对齐方式为居中对齐
+                    HorizontalMode = TextHorizontalMode.TextCenter,
+                    VerticalMode = TextVerticalMode.TextVerticalMid,
+                    //设置文字的对齐点
+                    AlignmentPoint = new Point3d(50, 30, 0)
+                };//创建第三个单行文字
                 db.AddToModelSpace(textFirst, textSecond, textLast);//添加文本到模型空间
                 trans.Commit();//提交事务处理
             }
@@ -629,8 +639,10 @@ namespace ArxTest
             Database db = HostApplicationServices.WorkingDatabase;
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
-                MText mtext = new MText();//创建多行文本对象
-                mtext.Location = new Point3d(100, 40, 0);//位置
+                MText mtext = new MText
+                {
+                    Location = new Point3d(100, 40, 0)//位置
+                };//创建多行文本对象
                 //创建水平分数形式的堆叠文字
                 string firstLine = TextTools.StackText(TextSpecialSymbol.Diameter + "20", "H7", "P7", StackType.HorizontalFraction, 0.5);
                 //创建斜分数形式的堆叠文字
@@ -659,19 +671,25 @@ namespace ArxTest
             Polyline polygon = new Polyline();
             polygon.CreatePolygon(new Point2d(500, 200), 6, 30);
             //创建一个圆
-            Circle circle = new Circle();
-            circle.Center = new Point3d(500, 200, 0);
-            circle.Radius = 10;
+            Circle circle = new Circle
+            {
+                Center = new Point3d(500, 200, 0),
+                Radius = 10
+            };
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 //将正六边形和圆添加到模型空间中
                 ObjectId polygonId = db.AddToModelSpace(polygon);
                 ObjectId circleId = db.AddToModelSpace(circle);
                 //创建一个ObjectId集合类对象，用于存储填充边界的ObjectId
-                ObjectIdCollection ids = new ObjectIdCollection();
-                ids.Add(polygonId);//将正六边形的ObjectId添加到边界集合中
-                Hatch hatch = new Hatch();//创建填充对象
-                hatch.PatternScale = 0.5;//设置填充图案的比例
+                ObjectIdCollection ids = new ObjectIdCollection
+                {
+                    polygonId//将正六边形的ObjectId添加到边界集合中
+                };
+                Hatch hatch = new Hatch
+                {
+                    PatternScale = 0.5//设置填充图案的比例
+                };//创建填充对象
                 //创建填充图案选项板
                 HatchPalletteDialog dlg = new HatchPalletteDialog();
                 //显示填充图案选项板
@@ -693,21 +711,23 @@ namespace ArxTest
         [CommandMethod("AddGradientHatch")]
         public void AddGradientHatch()
         {
-            Database db=HostApplicationServices.WorkingDatabase;
+            Database db = HostApplicationServices.WorkingDatabase;
             //创建一个三角形
-            Polyline triangle=new Polyline();
+            Polyline triangle = new Polyline();
             triangle.CreatePolygon(new Point2d(550, 200), 3, 30);
-            using (Transaction trans=db.TransactionManager.StartTransaction())
+            using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 //将三角形添加到模型空间中
-                ObjectId triangleId=db.AddToModelSpace(triangle);
+                ObjectId triangleId = db.AddToModelSpace(triangle);
                 //创建一个ObjectId集合类对象，用于存储填充边界的ObjectId
-                ObjectIdCollection ids=new ObjectIdCollection();
-                ids.Add(triangleId);//将三角形的ObjectId添加到边界集合中
-                Hatch hatch=new Hatch();//创建填充对象
+                ObjectIdCollection ids = new ObjectIdCollection
+                {
+                    triangleId//将三角形的ObjectId添加到边界集合中
+                };
+                Hatch hatch = new Hatch();//创建填充对象
                 //创建两个Color类变量，分别表示填充的起始颜色（红）和结束颜色（蓝）
-                Color color1=Color.FromColorIndex(ColorMethod.ByLayer, 1);
-                Color color2=Color.FromColor(System.Drawing.Color.Blue);
+                Color color1 = Color.FromColorIndex(ColorMethod.ByLayer, 1);
+                Color color2 = Color.FromColor(System.Drawing.Color.Blue);
                 //创建渐变填充，与边界无关联
                 hatch.CreateGradientHatch(HatchGradientName.Cylinder, color1, color2, false);
                 //为填充添加边界（三角形）
@@ -719,7 +739,389 @@ namespace ArxTest
 
         #endregion
 
+        #region 面域
+        [CommandMethod("AddRegion")]
+        public void AddRegion()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //创建一个三角形
+                Polyline triangle = new Polyline();
+                triangle.CreatePolygon(new Point2d(550, 200), 3, 30);
+                //根据三角形创建面域
+                List<Region> regions = RegionTools.CreateRegion(triangle);
+                if (regions.Count == 0) return;//如果面域创建未成功，则返回
+                Region region = regions[0];
+                db.AddToModelSpace(region);//将创建的面域添加到数据库中
+                //获取面域的质量特性
+                GetAreaProp(region);
+                trans.Commit();//提交更改
+            }
+        }
 
+        [CommandMethod("AddComplexRegion")]
+        public void AddComplexRegion()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //创建一个正六边形
+                Polyline polygon = new Polyline();
+                polygon.CreatePolygon(new Point2d(500, 200), 6, 30);
+                //创建一个圆
+                Circle circle = new Circle
+                {
+                    Center = new Point3d(500, 200, 0),
+                    Radius = 10
+                };
+                //根据正六边形和圆创建面域
+                List<Region> regions = RegionTools.CreateRegion(polygon, circle);
+                if (regions.Count == 0) return;//如果面域创建未成功，则返回
+                //使用LINQ按面积对面域进行排序
+                List<Region> orderRegions = (from r in regions
+                                             orderby r.Area
+                                             select r).ToList();
+                //对面域进行布尔操作，获取正六边形减去圆后的部分
+                orderRegions[1].BooleanOperation(BooleanOperationType.BoolSubtract, orderRegions[0]);
+
+                db.AddToModelSpace(regions[1]);//将上面操作好的面域添加到数据库中          
+
+                trans.Commit();//提交更改
+            }
+        }
+
+        private void GetAreaProp(Region region)
+        {
+            Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
+            ed.WriteMessage("\n ----------------    面域   ----------------");
+            ed.WriteMessage("\n面积:{0} ", region.Area);
+            ed.WriteMessage("\n周长:{0} ", region.Perimeter);
+            ed.WriteMessage("\n边界框上限:{0} ", region.GetExtentsHigh());
+            ed.WriteMessage("\n边界框下限:{0} ", region.GetExtentsLow());
+            ed.WriteMessage("\n质心: {0} ", region.GetCentroid());
+            ed.WriteMessage("\n惯性矩为: {0}; {1} ", region.GetMomInertia()[0], region.GetMomInertia()[1]);
+            ed.WriteMessage("\n惯性积为: {0} ", region.GetProdInertia());
+            ed.WriteMessage("\n主力矩为: {0}; {1} ", region.GetPrinMoments()[0], region.GetPrinMoments()[1]);
+            ed.WriteMessage("\n主方向为: {0}; {1} ", region.GetPrinAxes()[0], region.GetPrinAxes()[1]);
+            ed.WriteMessage("\n旋转半径为: {0}; {1} ", region.GetRadiiGyration()[0], region.GetRadiiGyration()[1]);
+        }
+
+        #endregion
+        #region 尺寸标注
+        //AlignedDimension 对齐标注
+        //RotatedDimension  转角标注
+        //RadialDimension    半径标注
+        //DiametricDimension   直径标注
+        // LineAngularDimension2  角度标注
+        //Point3AngularDimension  角度（3点）标注
+        //ArcDimension //弧长标注
+        //OrdnateDimension  坐标标注
+
+        [CommandMethod("DimTest")]
+        public void DimTest()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                // 创建要标注的图形
+                Line line1 = new Line(new Point3d(30, 20, 0), new Point3d(120, 20, 0));
+                Line line2 = new Line(new Point3d(120, 20, 0), new Point3d(120, 40, 0));
+                Line line3 = new Line(new Point3d(120, 40, 0), new Point3d(90, 80, 0));
+                Line line4 = new Line(new Point3d(90, 80, 0), new Point3d(30, 80, 0));
+                Arc arc = new Arc(new Point3d(30, 50, 0), 30, Math.PI / 2, Math.PI * 3 / 2);
+                Circle cir1 = new Circle(new Point3d(30, 50, 0), Vector3d.ZAxis, 15);
+                Circle cir2 = new Circle(new Point3d(70, 50, 0), Vector3d.ZAxis, 10);
+                //将图形添加到模型空间中
+                db.AddToModelSpace(line1, line2, line3, line4, arc, cir1, cir2);
+                //创建一个列表，用于存储标注对象
+                List<Dimension> dims = new List<Dimension>();
+                // 创建转角标注（水平）
+                RotatedDimension dimRotated1 = new RotatedDimension
+                {
+                    //指定第一条尺寸界线的附着位置
+                    XLine1Point = line1.StartPoint,
+                    //指定第二条尺寸界线的附着位置
+                    XLine2Point = line1.EndPoint,
+                    //指定尺寸线的位置
+                    DimLinePoint = GeTools.MidPoint(line1.StartPoint, line1.EndPoint).PolarPoint(-Math.PI / 2, 10),
+                    DimensionText = "<>mm"//设置标注的文字为标注值+后缀mm
+                };
+                dims.Add(dimRotated1);//将水平转角标注添加到列表中
+                //创建转角标注(垂直）
+                RotatedDimension dimRotated2 = new RotatedDimension
+                {
+                    Rotation = Math.PI / 2,//转角标注角度为90度，表示垂直方向
+                                           //指定两条尺寸界线的附着位置和尺寸线的位置
+                    XLine1Point = line2.StartPoint,
+                    XLine2Point = line2.EndPoint,
+                    DimLinePoint = GeTools.MidPoint(line2.StartPoint, line2.EndPoint).PolarPoint(0, 10)
+                };
+                dims.Add(dimRotated2);//将垂直转角标注添加到列表中
+                //创建转角标注（尺寸公差标注）
+                RotatedDimension dimRotated3 = new RotatedDimension
+                {
+                    //指定两条尺寸界线的附着位置和尺寸线的位置
+                    XLine1Point = line4.StartPoint,
+                    XLine2Point = line4.EndPoint,
+                    DimLinePoint = GeTools.MidPoint(line4.StartPoint, line4.EndPoint).PolarPoint(Math.PI / 2, 10),
+                    //设置标注的文字为标注值+堆叠文字
+                    DimensionText = TextTools.StackText("<>", "+0.026", "-0.025", StackType.Tolerance, 0.7)
+                };
+                dims.Add(dimRotated3);//将尺寸公差标注添加到列表中
+                // 创建对齐标注
+                AlignedDimension dimAligned = new AlignedDimension
+                {
+                    //指定两条尺寸界线的附着位置和尺寸线的位置
+                    XLine1Point = line3.StartPoint,
+                    XLine2Point = line3.EndPoint,
+                    DimLinePoint = GeTools.MidPoint(line3.StartPoint, line3.EndPoint).PolarPoint(Math.PI / 2, 10),
+                    //设置标注的文字为标注值+公差符号
+                    DimensionText = "<>" + TextSpecialSymbol.Tolerance + "0.2"
+                };
+                dims.Add(dimAligned);//将对齐标注添加到列表中
+                // 创建半径标注
+                RadialDimension dimRadial = new RadialDimension
+                {
+                    Center = cir1.Center,//圆或圆弧的圆心
+                                         //用于附着引线的圆或圆弧上的点
+                    ChordPoint = cir1.Center.PolarPoint(GeTools.DegreeToRadian(30), 15),
+                    LeaderLength = 10//引线长度
+                };
+                dims.Add(dimRadial);//将半径标注添加到列表中
+                // 创建直径标注
+                DiametricDimension dimDiametric = new DiametricDimension
+                {
+                    //圆或圆弧上第一个直径点的坐标
+                    ChordPoint = cir2.Center.PolarPoint(GeTools.DegreeToRadian(45), 10),
+                    //圆或圆弧上第二个直径点的坐标
+                    FarChordPoint = cir2.Center.PolarPoint(GeTools.DegreeToRadian(-135), 10),
+                    LeaderLength = 0//从 ChordPoint 到注解文字或折线处的长度
+                };
+                dims.Add(dimDiametric);//将直径标注添加到列表中
+                // 创建角度标注
+                Point3AngularDimension dimLineAngular = new Point3AngularDimension
+                {
+                    //圆或圆弧的圆心、或两尺寸界线间的共有顶点的坐标
+                    CenterPoint = line2.StartPoint,
+                    //指定两条尺寸界线的附着位置
+                    XLine1Point = line1.StartPoint,
+                    XLine2Point = line2.EndPoint,
+                    //设置角度标志圆弧线上的点
+                    ArcPoint = line2.StartPoint.PolarPoint(GeTools.DegreeToRadian(135), 10)
+                };
+                dims.Add(dimLineAngular);//将角度标注添加到列表中
+                // 创建弧长标注,标注文字取为默认值
+                ArcDimension dimArc = new ArcDimension(arc.Center, arc.StartPoint, arc.EndPoint, arc.Center.PolarPoint(Math.PI, arc.Radius + 10), "<>", db.Dimstyle);
+                dims.Add(dimArc);//将弧长标注添加到列表中
+                // 创建显示X轴值的坐标标注
+                OrdinateDimension dimX = new OrdinateDimension
+                {
+                    UsingXAxis = true,//显示 X 轴值
+                    DefiningPoint = cir2.Center,//标注点
+                                                //指定引线终点，即标注文字显示的位置
+                    LeaderEndPoint = cir2.Center.PolarPoint(-Math.PI / 2, 20)
+                };
+                dims.Add(dimX);//将坐标标注添加到列表中
+                // 创建显示Y轴值的坐标标注
+                OrdinateDimension dimY = new OrdinateDimension
+                {
+                    UsingXAxis = false,//显示Y轴                
+                    DefiningPoint = cir2.Center,//标注点
+                                                //指定引线终点，即标注文字显示的位置
+                    LeaderEndPoint = cir2.Center.PolarPoint(0, 20)
+                };
+                dims.Add(dimY);//将坐标标注添加到列表中
+                foreach (Dimension dim in dims)//遍历标注列表
+                {
+                    dim.DimensionStyle = db.Dimstyle;//设置标注样式为当前样式
+                    db.AddToModelSpace(dim);//将标注添加到模型空间中
+
+                }
+
+                trans.Commit();//提交更改
+            }
+        }
+        #endregion
+        #region 引线与形位公差
+        [CommandMethod("AddLeader")]
+        public void AddLeader()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (var trans = db.TransactionManager.StartTransaction())
+            {
+                //创建一个在原点直径为0.219的圆。
+                Circle circle = new Circle();
+                circle.Center = Point3d.Origin;
+                circle.Diameter = 0.219;
+                //创建一个多行文本并设置其内容为4Xφd±0.005（其中d为圆的直径）
+                MText txt = new MText();
+                txt.Contents = "4X" + TextSpecialSymbol.Diameter + circle.Diameter + TextSpecialSymbol.Tolerance + "0.005";
+                txt.Location = new Point3d(1, 1, 0);//文本位置
+                txt.TextHeight = 0.2;//文本高度 
+                db.AddToModelSpace(circle, txt);//将圆和文本添加到模型空间中                                
+                Leader leader = new Leader();//创建一个引线对象
+                //将圆上一点及文本位置作为引线的顶点
+                leader.AppendVertex(circle.Center.PolarPoint(Math.PI / 3, circle.Radius));
+                leader.AppendVertex(txt.Location);
+                db.AddToModelSpace(leader);//将引线添加到模型空间中
+                leader.Dimgap = 0.1;//设置引线的文字偏移为0.1
+                leader.Dimasz = 0.1;//设置引线的箭头大小为0.1
+                leader.Annotation = txt.ObjectId;//设置引线的注释对象为文本
+                leader.EvaluateLeader();//计算引线及其关联注释之间的关系
+                trans.Commit();//提交更改
+            }
+        }
+        [CommandMethod("AddMLeader")]
+        public void AddMLeader()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //创建3个点，分别表示引线的终点和两个头点
+                Point3d ptEnd = new Point3d(90, 0, 0);
+                Point3d pt1 = new Point3d(80, 20, 0);
+                Point3d pt2 = new Point3d(100, 20, 0);
+                MText mtext = new MText
+                {
+                    Contents = "多重引线示例"//文本内容
+                };//新建多行文本
+                MLeader mleader = new MLeader();//创建多重引线
+                //为多重引线添加引线束，引线束由基线和一些单引线构成
+                int leaderIndex = mleader.AddLeader();
+                //在引线束中添加一单引线
+                int lineIndex = mleader.AddLeaderLine(leaderIndex);
+                mleader.AddFirstVertex(lineIndex, pt1); //在单引线中添加引线头点
+
+                mleader.AddLastVertex(lineIndex, ptEnd); //在单引线中添加引线终点
+                //在引线束中再添加一单引线，并只设置引线头点
+                lineIndex = mleader.AddLeaderLine(leaderIndex);
+                mleader.AddFirstVertex(lineIndex, pt2);
+                //设置多重引线的注释为多行文本
+                mleader.ContentType = ContentType.MTextContent;
+                mleader.MText = mtext;
+                //将多重引线添加到模型空间
+                db.AddToModelSpace(mleader);
+                trans.Commit();
+            }
+        }
+        [CommandMethod("AddRoadMLeader")]
+        public void AddRoadMLeader()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            //获取符号为点的箭头块的ObjectId
+            ObjectId arrowId = db.GetArrowObjectId(DimArrowBlock.Dot);
+            //如果当前图形中还未加入上述箭头块，则加入并获取其ObjectId
+            if (arrowId == ObjectId.Null)
+            {
+                DimTools.ArrowBlock = DimArrowBlock.Dot;
+                arrowId = db.GetArrowObjectId(DimArrowBlock.Dot);
+            }
+            //创建一个点列表，在其中添加4个要标注的点
+            List<Point3d> pts = new List<Point3d>();
+            pts.Add(new Point3d(150, 0, 0));
+            pts.Add(new Point3d(150, 15, 0));
+            pts.Add(new Point3d(150, 18, 0));
+            pts.Add(new Point3d(150, 20, 0));
+            //各标注点对应的文字
+            List<string> contents = new List<string> { "道路中心线", "机动车道", "人行道", "绿化带" };
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                for (int i = 0; i < pts.Count; i++)//遍历标注点
+                {
+                    MText txt = new MText();//创建多行文本
+                    txt.Contents = contents[i];//文本内容
+                    MLeader mleader = new MLeader();//创建多重引线
+                    //为多重引线添加引线束，引线束由基线和一些单引线构成
+                    int leaderIndex = mleader.AddLeader();
+                    //在引线束中添加一单引线，并设置引线头点和终点
+                    int lineIndex = mleader.AddLeaderLine(leaderIndex);
+                    mleader.AddFirstVertex(lineIndex, pts[i]);
+                    mleader.AddLastVertex(lineIndex, pts[0].PolarPoint(Math.PI / 2, 20 + (i + 1) * 5));
+                    mleader.ArrowSymbolId = arrowId;//设置单引线的箭头块ObjectId
+                    //设置多重引线的注释为多行文本
+                    mleader.ContentType = ContentType.MTextContent;
+                    mleader.MText = txt;
+                    db.AddToModelSpace(mleader);
+                    mleader.ArrowSize = 1;//多重引线箭头大小
+                    mleader.DoglegLength = 0;//多重引线基线长度设为0
+                    //将基线连接到引线文字的下方并且绘制下划线
+                    mleader.TextAttachmentType = TextAttachmentType.AttachmentBottomLine;
+                }
+                trans.Commit();
+            }
+        }
+        [CommandMethod("AddTolerance")]
+        public void AddTolerance()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                //创建一个形位公差特征控制框
+                FeatureControlFrame frame = new FeatureControlFrame();
+                //形位公差的几何特征为位置
+                string geometricSym = DimFormatCode.Position;
+                //形位公差值为0.20，且带直径符号，包容条件为最大实体要求
+                string torlerance = DimFormatCode.Diameter + "0.20" + DimFormatCode.CircleM;
+                //形位公差的第一级基准符号,包容条件为最大实体要求
+                string firstDatum = "A" + DimFormatCode.CircleM;
+                //形位公差的第二级基准符号,包容条件为不考虑特征尺寸
+                string secondDatum = "B" + DimFormatCode.CircleS;
+                //形位公差的第三级基准符号,包容条件为最小实体要求
+                string thirdDatum = "C" + DimFormatCode.CircleL;
+                //设置公差特征控制框的内容为形位公差
+                frame.CreateTolerance(geometricSym, torlerance, firstDatum, secondDatum, thirdDatum);
+                frame.Location = new Point3d(1, 0.5, 0);//控制框的位置
+                frame.Dimscale = 0.05;//控制框的大小
+                db.AddToModelSpace(frame);//控制框添加到模型空间中
+                trans.Commit();//提交更改
+            }
+        }
+        [CommandMethod("AddCoordMLeader")]
+        public void AddCoordMLeader()
+        {
+            Database db = HostApplicationServices.WorkingDatabase;
+            //获取符号为无的箭头块的ObjectId
+            ObjectId arrowId = db.GetArrowObjectId(DimArrowBlock.None);
+            //如果当前图形中还未加入上述箭头块，则加入并获取其ObjectId
+            if (arrowId == ObjectId.Null)
+            {
+                DimTools.ArrowBlock = DimArrowBlock.None;
+                arrowId = db.GetArrowObjectId(DimArrowBlock.None);
+            }
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                Point3d ptCoord = new Point3d(80, 30, 0);//要标注的坐标点
+                MText mtext = new MText();//新建多行文本
+                //设置多行文本的内容为点的坐标值，并且分两行表示
+                mtext.Contents = "X:" + ptCoord.X.ToString("0.000") + @"\PY:" + ptCoord.Y.ToString("0.000");
+                mtext.LineSpacingFactor = 0.8;//多行文本的行间距
+                MLeader leader = new MLeader();//创建多重引线
+                //为多重引线添加引线束，引线束由基线和一些单引线构成
+                int leaderIndex = leader.AddLeader();
+                //在引线束中添加单引线
+                int lineIndex = leader.AddLeaderLine(leaderIndex);
+                //在单引线中添加引线头点（引线箭头所指向的点），位置为要进行标注的点
+                leader.AddFirstVertex(lineIndex, ptCoord);
+                //在单引线中添加引线终点
+                leader.AddLastVertex(lineIndex, ptCoord.PolarPoint(Math.PI / 4, 10));
+                //设置单引线的注释类型为多行文本
+                leader.ContentType = ContentType.MTextContent;
+                leader.MText = mtext;//设置单引线的注释文字
+                //将多重引线添加到模型空间
+                db.AddToModelSpace(leader);
+                leader.ArrowSymbolId = arrowId;//设置单引线的箭头块ObjectId
+                leader.DoglegLength = 0;//设置单引线的基线长度为0
+                //将基线连接到引线文字的下方并且绘制下划线
+                leader.TextAttachmentType = TextAttachmentType.AttachmentBottomOfTopLine;
+                trans.Commit();
+            }
+        }
+        #endregion
+
+        #region 获取用户输入信息
+
+        #endregion
     }
 
 }

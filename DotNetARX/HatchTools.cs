@@ -57,7 +57,7 @@ namespace DotNetARX
     {
         [SuppressUnmanagedCodeSecurity]
         [DllImport("acad.exe", EntryPoint = "?acedHatchPalletteDialog@@YA_NPB_W_NAAPA_W@Z", CharSet = CharSet.Auto)]
-        static extern bool acedHatchPalletteDialog(string currentPattern, bool showCustom, out IntPtr newPattern);
+        static extern bool AcedHatchPalletteDialog(string currentPattern, bool showCustom, out IntPtr newPattern);
         private string pattern;//用于存储用户选择的填充图案名称
         /// <summary>
         /// 是否显示自定义标签
@@ -86,7 +86,7 @@ namespace DotNetARX
         {
             IntPtr ptr;//用户选择的
             //显示填充图案选项板
-            bool isOK=acedHatchPalletteDialog(HatchTools.CurrentPattern, ShowCustom, out ptr);
+            bool isOK=AcedHatchPalletteDialog(HatchTools.CurrentPattern, ShowCustom, out ptr);
             if (!isOK) return false;//如果用户未选择填充图案，返回false
             //用户选择了填充图案，通过指针获得图案名称并将其置为当前名称
             pattern = HatchTools.CurrentPattern = Marshal.PtrToStringAuto(ptr);
